@@ -118,7 +118,7 @@ class Game21:
         print(f"相手の手札: {self.opponent_hand} (合計: ?+{opponent_score}/{Game21.MAX_SCORE})")
 
         if player_score > 21 and opponent_score > 21:
-            print("両者ともバーストしました！引き分けです。")
+            print("両者ともバーストしました！")
             return "draw"
         elif player_score > 21:
             print("あなたはバーストしました！")
@@ -127,7 +127,7 @@ class Game21:
             print("相手がバーストしました！")
             return "player"
         elif player_score == opponent_score:
-            print("両者とも同じスコアです！引き分けです。")
+            print("両者とも同じスコアです！")
             return "draw"
         elif player_score > opponent_score:
             return "player"
