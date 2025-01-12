@@ -27,11 +27,22 @@ class Game21:
             card = self.deck.pop()
             if not silent:
                 print(f"{owner}は{card}を引きました。")
-            # TODO:カードを引いた時にバーストしてるかどうかを判定したい
+            hand.append(card)
+
+            # カードを引いた後にバーストをチェック
+            if self.check_burst(hand, owner):
+                return "burst"
+
             return card
         else:
             print("山札が尽きました！")
             return None
+
+    def check_burst(self, hand, owner):
+        if self.calculate_score(hand) > self.MAX_SCORE:
+            print(f"{owner}はバーストしました！")
+            return True
+        return False
 
     def deal_initial_cards(self, hand, owner):
         for _ in range(2):
@@ -58,9 +69,9 @@ class Game21:
         print(f"相手の手札: {self.show_hand(self.opponent_hand)}")
         choice = self.get_player_input()
         if choice.lower() == 'y':
-            card = self.draw_card(self.player_hand, "あなた")
-            if card:
-                self.player_hand.append(card)
+            result = self.draw_card(self.player_hand, "あなた")
+            if result == "burst":
+                return False
         return choice.lower() != 'n'
 
     def get_player_input(self):
@@ -81,9 +92,9 @@ class Game21:
 
         # 相手の判断ロジック: スコアが17未満ならカードを引く
         if opponent_score < 17:
-            card = self.draw_card(self.opponent_hand, "相手")
-            if card:
-                self.opponent_hand.append(card)
+            result = self.draw_card(self.opponent_hand, "相手")
+            if result == "burst":
+                return False
             return True
         else:
             print("相手はカードを引きませんでした。")
@@ -115,8 +126,8 @@ class Game21:
         player_score = self.calculate_score(self.player_hand)
         opponent_score = self.calculate_score(self.opponent_hand)
 
-        print(f"\nあなたの手札: {self.player_hand} (合計: {player_score}/{Game21.MAX_SCORE})")
-        print(f"相手の手札: {self.opponent_hand} (合計: {opponent_score}/{Game21.MAX_SCORE})")
+        print(f"\nあなたの手札: {self.player_hand} (合計: ?+{player_score}/{Game21.MAX_SCORE})")
+        print(f"相手の手札: {self.opponent_hand} (合計: ?+{opponent_score}/{Game21.MAX_SCORE})")
 
         if player_score > 21 and opponent_score > 21:
             print("両者ともバーストしました！")
