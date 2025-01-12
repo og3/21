@@ -2,14 +2,17 @@ import random
 
 class Game21:
     MAX_SCORE = 21
+    INITIAL_LIFE = 5
+    INITIAL_CARDS = 2
+    MIN_OPPONENT_DRAW_SCORE = 17
 
     def __init__(self):
         self.initialize_game()
 
     def initialize_game(self):
         # プレイヤーと相手のライフカウンターを初期化
-        self.player_life = 5
-        self.opponent_life = 5
+        self.player_life = Game21.INITIAL_LIFE
+        self.opponent_life = Game21.INITIAL_LIFE
         self.round_number = 0
         self.reset_round()
 
@@ -34,7 +37,7 @@ class Game21:
             return None
 
     def deal_initial_cards(self, hand, owner):
-        for _ in range(2):
+        for _ in range(Game21.INITIAL_CARDS):
             self.draw_card(hand, owner, silent=True)
 
     def increment_round_number(self):
@@ -76,8 +79,8 @@ class Game21:
     def opponent_turn(self):
         opponent_score = self.calculate_score(self.opponent_hand)
 
-        # 相手の判断ロジック: スコアが17未満ならカードを引く
-        if opponent_score < 17:
+        # 相手の判断ロジック: スコアがMIN_OPPONENT_DRAW_SCORE未満ならカードを引く
+        if opponent_score < Game21.MIN_OPPONENT_DRAW_SCORE:
             self.draw_card(self.opponent_hand, "相手")
             return True
         else:
@@ -113,13 +116,13 @@ class Game21:
         print(f"\nあなたの手札: {self.player_hand} (合計: {player_score}/{Game21.MAX_SCORE})")
         print(f"相手の手札: {self.opponent_hand} (合計: {opponent_score}/{Game21.MAX_SCORE})")
 
-        if player_score > 21 and opponent_score > 21:
+        if player_score > Game21.MAX_SCORE and opponent_score > Game21.MAX_SCORE:
             print("両者ともバーストしました！")
             return "draw"
-        elif player_score > 21:
+        elif player_score > Game21.MAX_SCORE:
             print("あなたはバーストしました！")
             return "opponent"
-        elif opponent_score > 21:
+        elif opponent_score > Game21.MAX_SCORE:
             print("相手がバーストしました！")
             return "player"
         elif player_score == opponent_score:
