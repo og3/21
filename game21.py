@@ -30,7 +30,9 @@ class Game21:
             card = self.deck.pop()
             hand.append(card)
             if not silent:
+                self.highlight_line()
                 print(f"{owner}は{card}を引きました。")
+                self.highlight_line()
             return card
         else:
             print("山札が尽きました！")
@@ -84,7 +86,9 @@ class Game21:
             self.draw_card(self.opponent_hand, "相手")
             return True
         else:
+            self.highlight_line()
             print("相手はカードを引きませんでした。")
+            self.highlight_line()
             return False
 
     def alternating_turns(self):
@@ -104,6 +108,9 @@ class Game21:
 
             # 両者がカードを引かない場合に勝敗判定
             if player_done and opponent_done:
+                self.highlight_line()
+                print("お互いにカードを引かなかったので勝敗判定を行います...")
+                self.highlight_line()
                 return self.check_winner()
 
             # ターンの切り替え
@@ -183,6 +190,9 @@ class Game21:
             return "Error: ファイルが見つかりません。"
         except Exception as e:
             return f"Error: {e}"
+        
+    def highlight_line(self): 
+        print("***********************")
 
 # ゲームを開始
 if __name__ == "__main__":
