@@ -1,6 +1,8 @@
 import random
 
 class Game21:
+    MAX_SCORE = 21
+
     def __init__(self):
         self.initialize_game()
 
@@ -47,7 +49,7 @@ class Game21:
 
     def show_hand(self, hand):
         if len(hand) > 1:
-            return f"['?', {', '.join(map(str, hand[1:]))}] (合計: {self.calculate_score_excluding_first(hand)})"
+            return f"['?', {', '.join(map(str, hand[1:]))}] (合計: ?+{self.calculate_score_excluding_first(hand)}/{Game21.MAX_SCORE})"
         return "[]"
 
     def player_turn(self):
@@ -112,8 +114,8 @@ class Game21:
         player_score = self.calculate_score(self.player_hand)
         opponent_score = self.calculate_score(self.opponent_hand)
 
-        print(f"\nあなたの手札: {self.player_hand} (合計: {player_score})")
-        print(f"相手の手札: {self.opponent_hand} (合計: {opponent_score})")
+        print(f"\nあなたの手札: {self.player_hand} (合計: ?+{player_score}/{Game21.MAX_SCORE})")
+        print(f"相手の手札: {self.opponent_hand} (合計: ?+{opponent_score}/{Game21.MAX_SCORE})")
 
         if player_score > 21 and opponent_score > 21:
             print("両者ともバーストしました！引き分けです。")
