@@ -1,4 +1,5 @@
 import random
+import time
 
 class Game21:
     MAX_SCORE = 21
@@ -33,6 +34,7 @@ class Game21:
                 self.highlight_line()
                 print(f"{owner}は{card}を引きました。")
                 self.highlight_line()
+                self.display_with_pause()
             return card
         else:
             print("山札が尽きました！")
@@ -111,6 +113,7 @@ class Game21:
                 self.highlight_line()
                 print("お互いにカードを引かなかったので勝敗判定を行います...")
                 self.highlight_line()
+                self.display_with_pause()
                 return self.check_winner()
 
             # ターンの切り替え
@@ -193,6 +196,9 @@ class Game21:
         
     def highlight_line(self): 
         print("***********************")
+
+    def display_with_pause(self):
+        time.sleep(2)
 
 # ゲームを開始
 if __name__ == "__main__":
