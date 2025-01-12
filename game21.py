@@ -28,7 +28,6 @@ class Game21:
             hand.append(card)
             if not silent:
                 print(f"{owner}は{card}を引きました。")
-            # TODO:カードを引いた時にバーストしてるかどうかを判定したい
             return card
         else:
             print("山札が尽きました！")
@@ -63,7 +62,6 @@ class Game21:
         return choice.lower() != 'n'
 
     def get_player_input(self):
-        # プレイヤーがカードを引くかどうかを選べるようにする
         while True:
             try:
                 choice = input("カードを引きますか？ (y/n): ").strip().lower()
@@ -105,7 +103,7 @@ class Game21:
             if player_done and opponent_done:
                 return self.check_winner()
 
-            # 切り替え
+            # ターンの切り替え
             player_active = not player_active
 
     def check_winner(self):
@@ -133,7 +131,6 @@ class Game21:
             return "opponent"
 
     def play_round(self):
-        # 初期状態
         self.increment_round_number()
         self.deal_initial_cards(self.player_hand, "あなた")
         self.deal_initial_cards(self.opponent_hand, "相手")
