@@ -152,9 +152,11 @@ class Game21:
             result = self.play_round()
 
             if result == "player":
+                self.display_logo("you_win")
                 print(f"\nあなたの勝ちです！相手はライフを{self.round_number}失います。。")
                 self.opponent_life -= self.round_number
             elif result == "opponent":
+                self.display_logo("you_lose")
                 print(f"\nあなたの負けです！あなたはライフを{self.round_number}失います。。")
                 self.player_life -= self.round_number
             else:
@@ -163,12 +165,27 @@ class Game21:
             # ラウンドリセット
             self.reset_round()
 
+        self.display_logo("game_over")
         if self.player_life <= 0:
             print("\nゲームオーバー！相手の勝利です。")
         else:
             print("\nおめでとうございます！あなたの勝利です。")
 
+    def display_logo(self, logo_name):
+        filepath = f"logos/{logo_name}.txt"
+
+        try:
+            with open(filepath, 'r', encoding='utf-8') as file:
+                content = file.read()
+
+            print(content)
+        except FileNotFoundError:
+            return "Error: ファイルが見つかりません。"
+        except Exception as e:
+            return f"Error: {e}"
+
 # ゲームを開始
 if __name__ == "__main__":
     game = Game21()
+    game.display_logo("game_21")
     game.play_game()
