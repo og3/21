@@ -17,7 +17,7 @@ class Game21:
         # 山札 (1~11のカードが1セット)
         self.deck = [i for i in range(1, 12)]
         random.shuffle(self.deck)
-        
+
         # プレイヤーと相手の手札
         self.player_hand = []
         self.opponent_hand = []
@@ -25,6 +25,7 @@ class Game21:
     def draw_card(self, hand, owner, silent=False):
         if self.deck:
             card = self.deck.pop()
+            hand.append(card)
             if not silent:
                 print(f"{owner}は{card}を引きました。")
             # TODO:カードを引いた時にバーストしてるかどうかを判定したい
@@ -35,7 +36,7 @@ class Game21:
 
     def deal_initial_cards(self, hand, owner):
         for _ in range(2):
-            hand.append(self.draw_card(hand, owner, silent=True))
+            self.draw_card(hand, owner, silent=True)
 
     def increment_round_number(self):
         self.round_number += 1
@@ -58,9 +59,7 @@ class Game21:
         print(f"相手の手札: {self.show_hand(self.opponent_hand)}")
         choice = self.get_player_input()
         if choice.lower() == 'y':
-            card = self.draw_card(self.player_hand, "あなた")
-            if card:
-                self.player_hand.append(card)
+            self.draw_card(self.player_hand, "あなた")
         return choice.lower() != 'n'
 
     def get_player_input(self):
@@ -81,9 +80,7 @@ class Game21:
 
         # 相手の判断ロジック: スコアが17未満ならカードを引く
         if opponent_score < 17:
-            card = self.draw_card(self.opponent_hand, "相手")
-            if card:
-                self.opponent_hand.append(card)
+            self.draw_card(self.opponent_hand, "相手")
             return True
         else:
             print("相手はカードを引きませんでした。")
