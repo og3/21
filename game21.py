@@ -27,6 +27,7 @@ class Game21:
             card = self.deck.pop()
             if not silent:
                 print(f"{owner}は{card}を引きました。")
+            # TODO:カードを引いた時にバーストしてるかどうかを判定したい
             return card
         else:
             print("山札が尽きました！")
