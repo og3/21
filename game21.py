@@ -5,7 +5,9 @@ class Game21:
     MAX_SCORE = 21
     INITIAL_LIFE = 5
     INITIAL_CARDS = 2
+    INITIAL_ROUND_NUMBER = 0
     MIN_OPPONENT_DRAW_SCORE = 17
+    PAUSE_DURATION = 2
 
     def __init__(self):
         self.initialize_game()
@@ -14,7 +16,7 @@ class Game21:
         # プレイヤーと相手のライフカウンターを初期化
         self.player_life = Game21.INITIAL_LIFE
         self.opponent_life = Game21.INITIAL_LIFE
-        self.round_number = 0
+        self.round_number = Game21.INITIAL_ROUND_NUMBER
         self.reset_round()
 
     def reset_round(self):
@@ -195,7 +197,7 @@ class Game21:
         print(line)
 
     def display_with_pause(self):
-        time.sleep(2)
+        time.sleep(Game21.PAUSE_DURATION)
 
 # ゲームを開始
 if __name__ == "__main__":
