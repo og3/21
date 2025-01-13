@@ -31,9 +31,7 @@ class Game21:
             card = self.deck.pop()
             hand.append(card)
             if not silent:
-                self.highlight_line()
-                print(f"{owner}は{card}を引きました。")
-                self.highlight_line()
+                self.highlight_line(f"{owner}は{card}を引きました。")
                 self.display_with_pause()
             return card
         else:
@@ -88,9 +86,7 @@ class Game21:
             self.draw_card(self.opponent_hand, "相手")
             return True
         else:
-            self.highlight_line()
-            print("相手はカードを引きませんでした。")
-            self.highlight_line()
+            self.highlight_line("相手はカードを引きませんでした。")
             return False
 
     def alternating_turns(self):
@@ -110,9 +106,7 @@ class Game21:
 
             # 両者がカードを引かない場合に勝敗判定
             if player_done and opponent_done:
-                self.highlight_line()
-                print("お互いにカードを引かなかったので勝敗判定を行います...")
-                self.highlight_line()
+                self.highlight_line("お互いにカードを引かなかったので勝敗判定を行います...")
                 self.display_with_pause()
                 return self.check_winner()
 
@@ -194,8 +188,11 @@ class Game21:
         except Exception as e:
             return f"Error: {e}"
         
-    def highlight_line(self): 
-        print("***********************")
+    def highlight_line(self, text): 
+        line = "*" * (len(text) * 2)
+        print(line)
+        print(text)
+        print(line)
 
     def display_with_pause(self):
         time.sleep(2)
