@@ -28,10 +28,13 @@ class Effect:
         time.sleep(Effect.PAUSE_DURATION)
 
 
+class Card:
+    INITIAL_CARDS = 2
+
+
 class Game21:
     MAX_SCORE = 21
     INITIAL_LIFE = 5
-    INITIAL_CARDS = 2
     INITIAL_ROUND_NUMBER = 0
     MIN_OPPONENT_DRAW_SCORE = 17
 
@@ -69,7 +72,7 @@ class Game21:
 
     # class Card
     def deal_initial_cards(self, hand, owner):
-        for _ in range(Game21.INITIAL_CARDS):
+        for _ in range(Card.INITIAL_CARDS):
             self.draw_card(hand, owner, silent=True)
 
     def increment_round_number(self):
