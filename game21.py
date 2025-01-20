@@ -1,13 +1,39 @@
 import random
 import time
 
+
+class Effect:
+    PAUSE_DURATION = 2
+
+    def display_logo(logo_name):
+        filepath = f"logos/{logo_name}.txt"
+
+        try:
+            with open(filepath, "r", encoding="utf-8") as file:
+                content = file.read()
+
+            print(content)
+        except FileNotFoundError:
+            return "Error: ファイルが見つかりません。"
+        except Exception as e:
+            return f"Error: {e}"
+
+    def highlight_line(text):
+        line = "*" * (len(text) * 2)
+        print(line)
+        print(text)
+        print(line)
+
+    def display_with_pause():
+        time.sleep(Effect.PAUSE_DURATION)
+
+
 class Game21:
     MAX_SCORE = 21
     INITIAL_LIFE = 5
     INITIAL_CARDS = 2
     INITIAL_ROUND_NUMBER = 0
     MIN_OPPONENT_DRAW_SCORE = 17
-    PAUSE_DURATION = 2
 
     def __init__(self):
         self.initialize_game()
@@ -28,18 +54,20 @@ class Game21:
         self.player_hand = []
         self.opponent_hand = []
 
+    # class Card
     def draw_card(self, hand, owner, silent=False):
         if self.deck:
             card = self.deck.pop()
             hand.append(card)
             if not silent:
-                self.highlight_line(f"{owner}は{card}を引きました。")
-                self.display_with_pause()
+                Effect.highlight_line(f"{owner}は{card}を引きました。")
+                Effect.display_with_pause()
             return card
         else:
             print("山札が尽きました！")
             return None
 
+    # class Card
     def deal_initial_cards(self, hand, owner):
         for _ in range(Game21.INITIAL_CARDS):
             self.draw_card(hand, owner, silent=True)
@@ -47,14 +75,17 @@ class Game21:
     def increment_round_number(self):
         self.round_number += 1
 
+    # class Card
     def calculate_score(self, hand):
         total = sum(hand)
         return total
 
+    # class Card
     def calculate_score_excluding_first(self, hand):
         total = sum(hand[1:])
         return total
 
+    # class Card
     def show_hand(self, hand):
         if len(hand) > 1:
             return f"['?', {', '.join(map(str, hand[1:]))}] (合計: ?+{self.calculate_score_excluding_first(hand)}/{Game21.MAX_SCORE})"
@@ -64,21 +95,21 @@ class Game21:
         print(f"\nあなたの手札: {self.show_hand(self.player_hand)}")
         print(f"相手の手札: {self.show_hand(self.opponent_hand)}")
         choice = self.get_player_input()
-        if choice.lower() == 'y':
+        if choice.lower() == "y":
             self.draw_card(self.player_hand, "あなた")
-        return choice.lower() != 'n'
+        return choice.lower() != "n"
 
     def get_player_input(self):
         while True:
             try:
                 choice = input("カードを引きますか？ (y/n): ").strip().lower()
-                if choice in ['y', 'n']:
+                if choice in ["y", "n"]:
                     return choice
                 else:
                     print("無効な入力です。'y' または 'n' を入力してください。")
             except EOFError:
                 print("入力エラーが発生しました。デフォルト値 'n' を使用します。")
-                return 'n'
+                return "n"
 
     def opponent_turn(self):
         opponent_score = self.calculate_score(self.opponent_hand)
@@ -88,7 +119,7 @@ class Game21:
             self.draw_card(self.opponent_hand, "相手")
             return True
         else:
-            self.highlight_line("相手はカードを引きませんでした。")
+            Effect.highlight_line("相手はカードを引きませんでした。")
             return False
 
     def alternating_turns(self):
@@ -108,8 +139,10 @@ class Game21:
 
             # 両者がカードを引かない場合に勝敗判定
             if player_done and opponent_done:
-                self.highlight_line("お互いにカードを引かなかったので勝敗判定を行います...")
-                self.display_with_pause()
+                Effect.highlight_line(
+                    "お互いにカードを引かなかったので勝敗判定を行います..."
+                )
+                Effect.display_with_pause()
                 return self.check_winner()
 
             # ターンの切り替え
@@ -119,8 +152,12 @@ class Game21:
         player_score = self.calculate_score(self.player_hand)
         opponent_score = self.calculate_score(self.opponent_hand)
 
-        print(f"\nあなたの手札: {self.player_hand} (合計: {player_score}/{Game21.MAX_SCORE})")
-        print(f"相手の手札: {self.opponent_hand} (合計: {opponent_score}/{Game21.MAX_SCORE})")
+        print(
+            f"\nあなたの手札: {self.player_hand} (合計: {player_score}/{Game21.MAX_SCORE})"
+        )
+        print(
+            f"相手の手札: {self.opponent_hand} (合計: {opponent_score}/{Game21.MAX_SCORE})"
+        )
 
         if player_score > Game21.MAX_SCORE and opponent_score > Game21.MAX_SCORE:
             print("両者ともバーストしました！")
@@ -158,12 +195,16 @@ class Game21:
             result = self.play_round()
 
             if result == "player":
-                self.display_logo("you_win")
-                print(f"\nあなたの勝ちです！相手はライフを{self.round_number}失います。。")
+                Effect.display_logo("you_win")
+                print(
+                    f"\nあなたの勝ちです！相手はライフを{self.round_number}失います。。"
+                )
                 self.opponent_life -= self.round_number
             elif result == "opponent":
-                self.display_logo("you_lose")
-                print(f"\nあなたの負けです！あなたはライフを{self.round_number}失います。。")
+                Effect.display_logo("you_lose")
+                print(
+                    f"\nあなたの負けです！あなたはライフを{self.round_number}失います。。"
+                )
                 self.player_life -= self.round_number
             else:
                 print("\n引き分けです！ラウンドは進みますが、ライフはそのままです。。")
@@ -171,36 +212,15 @@ class Game21:
             # ラウンドリセット
             self.reset_round()
 
-        self.display_logo("game_over")
+        Effect.display_logo("game_over")
         if self.player_life <= 0:
             print("\nゲームオーバー！相手の勝利です。")
         else:
             print("\nおめでとうございます！あなたの勝利です。")
 
-    def display_logo(self, logo_name):
-        filepath = f"logos/{logo_name}.txt"
-
-        try:
-            with open(filepath, 'r', encoding='utf-8') as file:
-                content = file.read()
-
-            print(content)
-        except FileNotFoundError:
-            return "Error: ファイルが見つかりません。"
-        except Exception as e:
-            return f"Error: {e}"
-        
-    def highlight_line(self, text): 
-        line = "*" * (len(text) * 2)
-        print(line)
-        print(text)
-        print(line)
-
-    def display_with_pause(self):
-        time.sleep(Game21.PAUSE_DURATION)
 
 # ゲームを開始
 if __name__ == "__main__":
     game = Game21()
-    game.display_logo("game_21")
+    Effect.display_logo("game_21")
     game.play_game()
