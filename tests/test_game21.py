@@ -1,5 +1,5 @@
 import pytest
-from game21 import Game21
+from game21 import Game21, Effect
 import itertools
 
 @pytest.fixture
@@ -75,15 +75,15 @@ def test_play_round(game, mocker):
     result = game.play_round()
     assert result in ["player", "opponent", "draw"]
 
-def test_display_logo(game, mocker):
+def test_display_logo(mocker):
     mocker.patch("builtins.open", mocker.mock_open(read_data="Game 21 Logo"))
-    assert game.display_logo("game_21") is None
+    assert Effect.display_logo("game_21") is None
 
     mocker.patch("builtins.open", side_effect=FileNotFoundError)
-    assert game.display_logo("missing") == "Error: ファイルが見つかりません。"
+    assert Effect.display_logo("missing") == "Error: ファイルが見つかりません。"
 
     mocker.patch("builtins.open", side_effect=Exception("Test Error"))
-    assert game.display_logo("error") == "Error: Test Error"
+    assert Effect.display_logo("error") == "Error: Test Error"
 
 def test_play_game_lifecycle(game, mocker):
     mocker.patch.object(Game21, 'get_player_input', side_effect=itertools.cycle(['n']))
