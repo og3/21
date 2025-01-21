@@ -39,6 +39,15 @@ class Player:
     def calculate_score(self):
         return sum(self.hand)
 
+    def calculate_score_excluding_first(self):
+        return sum(self.hand[1:])
+
+    def show_hand(self, hide_first_card=False):
+        if hide_first_card and len(self.hand) > 1:
+            return f"['?', {', '.join(map(str, self.hand[1:]))}] (合計: ?+{self.calculate_score_excluding_first()}/{Game21.MAX_SCORE})"
+
+        return f"{self.hand} (合計: {self.calculate_score()}/{Game21.MAX_SCORE})"
+
 
 class Game21:
     MAX_SCORE = 21
@@ -84,18 +93,9 @@ class Game21:
     def increment_round_number(self):
         self.round_number += 1
 
-    def calculate_score_excluding_first(self, hand):
-        total = sum(hand[1:])
-        return total
-
-    def show_hand(self, hand):
-        if len(hand) > 1:
-            return f"['?', {', '.join(map(str, hand[1:]))}] (合計: ?+{self.calculate_score_excluding_first(hand)}/{Game21.MAX_SCORE})"
-        return "[]"
-
     def player_turn(self):
-        print(f"\nあなたの手札: {self.show_hand(self.player.hand)}")
-        print(f"相手の手札: {self.show_hand(self.opponent.hand)}")
+        print(f"\nあなたの手札: {self.player.show_hand(hide_first_card=True)}")
+        print(f"相手の手札: {self.opponent.show_hand(hide_first_card=True)}")
         choice = self.get_player_input()
         if choice.lower() == "y":
             self.draw_card(self.player.hand, "あなた")
@@ -154,12 +154,8 @@ class Game21:
         player_score = self.player.calculate_score()
         opponent_score = self.opponent.calculate_score()
 
-        print(
-            f"\nあなたの手札: {self.player.hand} (合計: {player_score}/{Game21.MAX_SCORE})"
-        )
-        print(
-            f"相手の手札: {self.opponent.hand} (合計: {opponent_score}/{Game21.MAX_SCORE})"
-        )
+        print(f"\nあなたの手札: {self.player.show_hand(hide_first_card=False)})")
+        print(f"相手の手札: {self.opponent.show_hand(hide_first_card=False)})")
 
         if player_score > Game21.MAX_SCORE and opponent_score > Game21.MAX_SCORE:
             print("両者ともバーストしました！")
@@ -183,8 +179,8 @@ class Game21:
         self.deal_initial_cards(self.player.hand, "あなた")
         self.deal_initial_cards(self.opponent.hand, "相手")
 
-        print(f"\nあなたの手札: {self.show_hand(self.player.hand)}")
-        print(f"相手の手札: {self.show_hand(self.opponent.hand)}")
+        print(f"\nあなたの手札: {self.player.show_hand(hide_first_card=True)}")
+        print(f"相手の手札: {self.opponent.show_hand(hide_first_card=True)}")
 
         # 交互にカードを引く
         return self.alternating_turns()
