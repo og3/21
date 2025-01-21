@@ -33,6 +33,9 @@ class Player:
         self.life = initial_life
         self.hand = []
 
+    def reset_hand(self):
+        self.hand = []
+
 
 class Game21:
     MAX_SCORE = 21
@@ -56,9 +59,8 @@ class Game21:
         self.deck = [i for i in range(1, 12)]
         random.shuffle(self.deck)
 
-        # プレイヤーと相手の手札
-        self.player.hand = []
-        self.opponent.hand = []
+        self.player.reset_hand()
+        self.opponent.reset_hand()
 
     def draw_card(self, hand, owner, silent=False):
         if self.deck:
