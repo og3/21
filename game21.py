@@ -28,6 +28,41 @@ class Effect:
         time.sleep(Effect.PAUSE_DURATION)
 
 
+class Player:
+    def __init__(self, name, initial_life):
+        self.name = name
+        self.life = initial_life
+        self.hand = []
+
+    def reset_hand(self):
+        self.hand = []
+
+    def calculate_score(self):
+        return sum(self.hand)
+
+    def calculate_score_excluding_first(self):
+        return sum(self.hand[1:])
+
+    def show_hand(self, hide_first_card=False):
+        if hide_first_card and len(self.hand) > 1:
+            return f"['?', {', '.join(map(str, self.hand[1:]))}] (合計: ?+{self.calculate_score_excluding_first()}/{Game21.MAX_SCORE})"
+
+        return f"{self.hand} (合計: {self.calculate_score()}/{Game21.MAX_SCORE})"
+
+    def draw_card(self, deck, silent=False):
+        if deck:
+            card = deck.pop()
+            self.hand.append(card)
+            if not silent:
+                Effect.highlight_line(f"{self.name}は{card}を引きました。")
+                Effect.display_with_pause()
+
+            return card
+        else:
+            print("山札が尽きました！")
+            return None
+
+
 class Game21:
     MAX_SCORE = 21
     INITIAL_LIFE = 5
@@ -40,8 +75,8 @@ class Game21:
 
     def initialize_game(self):
         # プレイヤーと相手のライフカウンターを初期化
-        self.player_life = Game21.INITIAL_LIFE
-        self.opponent_life = Game21.INITIAL_LIFE
+        self.player = Player("あなた", Game21.INITIAL_LIFE)
+        self.opponent = Player("相手", Game21.INITIAL_LIFE)
         self.round_number = Game21.INITIAL_ROUND_NUMBER
         self.reset_round()
 
@@ -50,53 +85,23 @@ class Game21:
         self.deck = [i for i in range(1, 12)]
         random.shuffle(self.deck)
 
-        # プレイヤーと相手の手札
-        self.player_hand = []
-        self.opponent_hand = []
+        self.player.reset_hand()
+        self.opponent.reset_hand()
 
-    # class Card
-    def draw_card(self, hand, owner, silent=False):
-        if self.deck:
-            card = self.deck.pop()
-            hand.append(card)
-            if not silent:
-                Effect.highlight_line(f"{owner}は{card}を引きました。")
-                Effect.display_with_pause()
-            return card
-        else:
-            print("山札が尽きました！")
-            return None
-
-    # class Card
-    def deal_initial_cards(self, hand, owner):
+    def deal_initial_cards(self):
         for _ in range(Game21.INITIAL_CARDS):
-            self.draw_card(hand, owner, silent=True)
+            self.player.draw_card(self.deck, silent=True)
+            self.opponent.draw_card(self.deck, silent=True)
 
     def increment_round_number(self):
         self.round_number += 1
 
-    # class Card
-    def calculate_score(self, hand):
-        total = sum(hand)
-        return total
-
-    # class Card
-    def calculate_score_excluding_first(self, hand):
-        total = sum(hand[1:])
-        return total
-
-    # class Card
-    def show_hand(self, hand):
-        if len(hand) > 1:
-            return f"['?', {', '.join(map(str, hand[1:]))}] (合計: ?+{self.calculate_score_excluding_first(hand)}/{Game21.MAX_SCORE})"
-        return "[]"
-
     def player_turn(self):
-        print(f"\nあなたの手札: {self.show_hand(self.player_hand)}")
-        print(f"相手の手札: {self.show_hand(self.opponent_hand)}")
+        print(f"\nあなたの手札: {self.player.show_hand(hide_first_card=True)}")
+        print(f"相手の手札: {self.opponent.show_hand(hide_first_card=True)}")
         choice = self.get_player_input()
         if choice.lower() == "y":
-            self.draw_card(self.player_hand, "あなた")
+            self.player.draw_card(self.deck)
         return choice.lower() != "n"
 
     def get_player_input(self):
@@ -112,11 +117,11 @@ class Game21:
                 return "n"
 
     def opponent_turn(self):
-        opponent_score = self.calculate_score(self.opponent_hand)
+        opponent_score = self.opponent.calculate_score()
 
         # 相手の判断ロジック: スコアがMIN_OPPONENT_DRAW_SCORE未満ならカードを引く
         if opponent_score < Game21.MIN_OPPONENT_DRAW_SCORE:
-            self.draw_card(self.opponent_hand, "相手")
+            self.opponent.draw_card(self.deck)
             return True
         else:
             Effect.highlight_line("相手はカードを引きませんでした。")
@@ -149,15 +154,11 @@ class Game21:
             player_active = not player_active
 
     def check_winner(self):
-        player_score = self.calculate_score(self.player_hand)
-        opponent_score = self.calculate_score(self.opponent_hand)
+        player_score = self.player.calculate_score()
+        opponent_score = self.opponent.calculate_score()
 
-        print(
-            f"\nあなたの手札: {self.player_hand} (合計: {player_score}/{Game21.MAX_SCORE})"
-        )
-        print(
-            f"相手の手札: {self.opponent_hand} (合計: {opponent_score}/{Game21.MAX_SCORE})"
-        )
+        print(f"\nあなたの手札: {self.player.show_hand(hide_first_card=False)})")
+        print(f"相手の手札: {self.opponent.show_hand(hide_first_card=False)})")
 
         if player_score > Game21.MAX_SCORE and opponent_score > Game21.MAX_SCORE:
             print("両者ともバーストしました！")
@@ -178,19 +179,18 @@ class Game21:
 
     def play_round(self):
         self.increment_round_number()
-        self.deal_initial_cards(self.player_hand, "あなた")
-        self.deal_initial_cards(self.opponent_hand, "相手")
+        self.deal_initial_cards()
 
-        print(f"\nあなたの手札: {self.show_hand(self.player_hand)}")
-        print(f"相手の手札: {self.show_hand(self.opponent_hand)}")
+        print(f"\nあなたの手札: {self.player.show_hand(hide_first_card=True)}")
+        print(f"相手の手札: {self.opponent.show_hand(hide_first_card=True)}")
 
         # 交互にカードを引く
         return self.alternating_turns()
 
     def play_game(self):
-        while self.player_life > 0 and self.opponent_life > 0:
+        while self.player.life > 0 and self.opponent.life > 0:
             print(f"\n--- 第{self.round_number + 1}ラウンド  ---")
-            print(f"ライフ: あなた {self.player_life} - 相手 {self.opponent_life}")
+            print(f"ライフ: あなた {self.player.life} - 相手 {self.opponent.life}")
 
             result = self.play_round()
 
@@ -199,13 +199,13 @@ class Game21:
                 print(
                     f"\nあなたの勝ちです！相手はライフを{self.round_number}失います。。"
                 )
-                self.opponent_life -= self.round_number
+                self.opponent.life -= self.round_number
             elif result == "opponent":
                 Effect.display_logo("you_lose")
                 print(
                     f"\nあなたの負けです！あなたはライフを{self.round_number}失います。。"
                 )
-                self.player_life -= self.round_number
+                self.player.life -= self.round_number
             else:
                 print("\n引き分けです！ラウンドは進みますが、ライフはそのままです。。")
 
@@ -213,7 +213,7 @@ class Game21:
             self.reset_round()
 
         Effect.display_logo("game_over")
-        if self.player_life <= 0:
+        if self.player.life <= 0:
             print("\nゲームオーバー！相手の勝利です。")
         else:
             print("\nおめでとうございます！あなたの勝利です。")

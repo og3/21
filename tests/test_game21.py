@@ -9,37 +9,39 @@ def game():
 
 
 def test_initialization(game):
-    assert game.player_life == Game21.INITIAL_LIFE
-    assert game.opponent_life == Game21.INITIAL_LIFE
+    assert game.player.life == Game21.INITIAL_LIFE
+    assert game.opponent.life == Game21.INITIAL_LIFE
     assert game.round_number == Game21.INITIAL_ROUND_NUMBER
     assert len(game.deck) == 11
-    assert game.player_hand == []
-    assert game.opponent_hand == []
+    assert game.player.hand == []
+    assert game.opponent.hand == []
 
 
 def test_reset_round(game):
     game.reset_round()
     assert len(game.deck) == 11
-    assert game.player_hand == []
-    assert game.opponent_hand == []
+    assert game.player.hand == []
+    assert game.opponent.hand == []
 
 
 def test_draw_card(game):
-    card = game.draw_card(game.player_hand, "Player", silent=True)
+    card = game.player.draw_card(game.deck, silent=True)
     assert card in range(1, 12)
-    assert len(game.player_hand) == 1
+    assert len(game.player.hand) == 1
     assert len(game.deck) == 10
 
     empty_deck_game = Game21()
     empty_deck_game.deck = []
-    card = empty_deck_game.draw_card(empty_deck_game.player_hand, "Player", silent=True)
+    card = empty_deck_game.player.draw_card(empty_deck_game.deck, silent=True)
     assert card is None
 
 
 def test_deal_initial_cards(game):
-    game.deal_initial_cards(game.player_hand, "Player")
-    assert len(game.player_hand) == Game21.INITIAL_CARDS
-    assert len(game.deck) == 11 - Game21.INITIAL_CARDS
+    game.deal_initial_cards()
+    dealed_cards = Game21.INITIAL_CARDS * 2
+    assert len(game.player.hand) == Game21.INITIAL_CARDS
+    assert len(game.opponent.hand) == Game21.INITIAL_CARDS
+    assert len(game.deck) == 11 - dealed_cards
 
 
 def test_increment_round_number(game):
@@ -48,40 +50,40 @@ def test_increment_round_number(game):
 
 
 def test_calculate_score(game):
-    game.player_hand = [5, 6, 7]
-    assert game.calculate_score(game.player_hand) == 18
+    game.player.hand = [5, 6, 7]
+    assert game.player.calculate_score() == 18
 
 
 def test_calculate_score_excluding_first(game):
-    game.player_hand = [5, 6, 7]
-    assert game.calculate_score_excluding_first(game.player_hand) == 13
+    game.player.hand = [5, 6, 7]
+    assert game.player.calculate_score_excluding_first() == 13
 
 
 def test_show_hand(game):
-    game.player_hand = [5, 6, 7]
-    assert game.show_hand(game.player_hand) == "['?', 6, 7] (合計: ?+13/21)"
-    assert game.show_hand([]) == "[]"
+    game.player.hand = [5, 6, 7]
+    assert game.player.show_hand(hide_first_card=True) == "['?', 6, 7] (合計: ?+13/21)"
+    assert game.player.show_hand(hide_first_card=False) == "[5, 6, 7] (合計: 18/21)"
 
 
 def test_opponent_turn(game):
-    game.opponent_hand = [5]
+    game.opponent.hand = [5]
     game.opponent_turn()
     assert (
-        len(game.opponent_hand) > 1
-        or game.calculate_score(game.opponent_hand) >= Game21.MIN_OPPONENT_DRAW_SCORE
+        len(game.opponent.hand) > 1
+        or game.opponent.calculate_score() >= Game21.MIN_OPPONENT_DRAW_SCORE
     )
 
 
 def test_check_winner(game):
-    game.player_hand = [10, 7]
-    game.opponent_hand = [9, 6]
+    game.player.hand = [10, 7]
+    game.opponent.hand = [9, 6]
     assert game.check_winner() == "player"
 
-    game.player_hand = [10, 2]
+    game.player.hand = [10, 2]
     assert game.check_winner() == "opponent"
 
-    game.player_hand = [10, 7]
-    game.opponent_hand = [10, 7]
+    game.player.hand = [10, 7]
+    game.opponent.hand = [10, 7]
     assert game.check_winner() == "draw"
 
 
@@ -104,7 +106,7 @@ def test_display_logo(mocker):
 
 def test_play_game_lifecycle(game, mocker):
     mocker.patch.object(Game21, "get_player_input", side_effect=itertools.cycle(["n"]))
-    game.player_life = 1
-    game.opponent_life = 1
+    game.player.life = 1
+    game.opponent.life = 1
     game.play_game()
-    assert game.player_life == 0 or game.opponent_life == 0
+    assert game.player.life == 0 or game.opponent.life == 0
