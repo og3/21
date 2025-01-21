@@ -49,7 +49,7 @@ def test_increment_round_number(game):
 
 def test_calculate_score(game):
     game.player.hand = [5, 6, 7]
-    assert game.calculate_score(game.player.hand) == 18
+    assert game.player.calculate_score() == 18
 
 
 def test_calculate_score_excluding_first(game):
@@ -68,7 +68,7 @@ def test_opponent_turn(game):
     game.opponent_turn()
     assert (
         len(game.opponent.hand) > 1
-        or game.calculate_score(game.opponent.hand) >= Game21.MIN_OPPONENT_DRAW_SCORE
+        or game.opponent.calculate_score() >= Game21.MIN_OPPONENT_DRAW_SCORE
     )
 
 

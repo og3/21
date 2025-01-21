@@ -36,6 +36,9 @@ class Player:
     def reset_hand(self):
         self.hand = []
 
+    def calculate_score(self):
+        return sum(self.hand)
+
 
 class Game21:
     MAX_SCORE = 21
@@ -81,10 +84,6 @@ class Game21:
     def increment_round_number(self):
         self.round_number += 1
 
-    def calculate_score(self, hand):
-        total = sum(hand)
-        return total
-
     def calculate_score_excluding_first(self, hand):
         total = sum(hand[1:])
         return total
@@ -115,7 +114,7 @@ class Game21:
                 return "n"
 
     def opponent_turn(self):
-        opponent_score = self.calculate_score(self.opponent.hand)
+        opponent_score = self.opponent.calculate_score()
 
         # 相手の判断ロジック: スコアがMIN_OPPONENT_DRAW_SCORE未満ならカードを引く
         if opponent_score < Game21.MIN_OPPONENT_DRAW_SCORE:
@@ -152,8 +151,8 @@ class Game21:
             player_active = not player_active
 
     def check_winner(self):
-        player_score = self.calculate_score(self.player.hand)
-        opponent_score = self.calculate_score(self.opponent.hand)
+        player_score = self.player.calculate_score()
+        opponent_score = self.opponent.calculate_score()
 
         print(
             f"\nあなたの手札: {self.player.hand} (合計: {player_score}/{Game21.MAX_SCORE})"
