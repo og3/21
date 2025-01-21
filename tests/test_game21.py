@@ -25,21 +25,23 @@ def test_reset_round(game):
 
 
 def test_draw_card(game):
-    card = game.draw_card(game.player.hand, "Player", silent=True)
+    card = game.player.draw_card(game.deck, silent=True)
     assert card in range(1, 12)
     assert len(game.player.hand) == 1
     assert len(game.deck) == 10
 
     empty_deck_game = Game21()
     empty_deck_game.deck = []
-    card = empty_deck_game.draw_card(empty_deck_game.player.hand, "Player", silent=True)
+    card = empty_deck_game.player.draw_card(empty_deck_game.deck, silent=True)
     assert card is None
 
 
 def test_deal_initial_cards(game):
-    game.deal_initial_cards(game.player.hand, "Player")
+    game.deal_initial_cards()
+    dealed_cards = Game21.INITIAL_CARDS * 2
     assert len(game.player.hand) == Game21.INITIAL_CARDS
-    assert len(game.deck) == 11 - Game21.INITIAL_CARDS
+    assert len(game.opponent.hand) == Game21.INITIAL_CARDS
+    assert len(game.deck) == 11 - dealed_cards
 
 
 def test_increment_round_number(game):

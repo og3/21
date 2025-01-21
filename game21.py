@@ -29,7 +29,8 @@ class Effect:
 
 
 class Player:
-    def __init__(self, initial_life):
+    def __init__(self, name, initial_life):
+        self.name = name
         self.life = initial_life
         self.hand = []
 
@@ -48,6 +49,19 @@ class Player:
 
         return f"{self.hand} (合計: {self.calculate_score()}/{Game21.MAX_SCORE})"
 
+    def draw_card(self, deck, silent=False):
+        if deck:
+            card = deck.pop()
+            self.hand.append(card)
+            if not silent:
+                Effect.highlight_line(f"{self.name}は{card}を引きました。")
+                Effect.display_with_pause()
+
+            return card
+        else:
+            print("山札が尽きました！")
+            return None
+
 
 class Game21:
     MAX_SCORE = 21
@@ -61,8 +75,8 @@ class Game21:
 
     def initialize_game(self):
         # プレイヤーと相手のライフカウンターを初期化
-        self.player = Player(Game21.INITIAL_LIFE)
-        self.opponent = Player(Game21.INITIAL_LIFE)
+        self.player = Player("あなた", Game21.INITIAL_LIFE)
+        self.opponent = Player("相手", Game21.INITIAL_LIFE)
         self.round_number = Game21.INITIAL_ROUND_NUMBER
         self.reset_round()
 
@@ -74,21 +88,10 @@ class Game21:
         self.player.reset_hand()
         self.opponent.reset_hand()
 
-    def draw_card(self, hand, owner, silent=False):
-        if self.deck:
-            card = self.deck.pop()
-            hand.append(card)
-            if not silent:
-                Effect.highlight_line(f"{owner}は{card}を引きました。")
-                Effect.display_with_pause()
-            return card
-        else:
-            print("山札が尽きました！")
-            return None
-
-    def deal_initial_cards(self, hand, owner):
+    def deal_initial_cards(self):
         for _ in range(Game21.INITIAL_CARDS):
-            self.draw_card(hand, owner, silent=True)
+            self.player.draw_card(self.deck, silent=True)
+            self.opponent.draw_card(self.deck, silent=True)
 
     def increment_round_number(self):
         self.round_number += 1
@@ -98,7 +101,7 @@ class Game21:
         print(f"相手の手札: {self.opponent.show_hand(hide_first_card=True)}")
         choice = self.get_player_input()
         if choice.lower() == "y":
-            self.draw_card(self.player.hand, "あなた")
+            self.player.draw_card(self.deck)
         return choice.lower() != "n"
 
     def get_player_input(self):
@@ -118,7 +121,7 @@ class Game21:
 
         # 相手の判断ロジック: スコアがMIN_OPPONENT_DRAW_SCORE未満ならカードを引く
         if opponent_score < Game21.MIN_OPPONENT_DRAW_SCORE:
-            self.draw_card(self.opponent.hand, "相手")
+            self.opponent.draw_card(self.deck)
             return True
         else:
             Effect.highlight_line("相手はカードを引きませんでした。")
@@ -176,8 +179,7 @@ class Game21:
 
     def play_round(self):
         self.increment_round_number()
-        self.deal_initial_cards(self.player.hand, "あなた")
-        self.deal_initial_cards(self.opponent.hand, "相手")
+        self.deal_initial_cards()
 
         print(f"\nあなたの手札: {self.player.show_hand(hide_first_card=True)}")
         print(f"相手の手札: {self.opponent.show_hand(hide_first_card=True)}")
