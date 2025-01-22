@@ -50,8 +50,8 @@ class Player:
         return f"{self.hand} (合計: {self.calculate_score()}/{Game21.MAX_SCORE})"
 
     def draw_card(self, deck, silent=False):
-        if deck:
-            card = deck.pop()
+        if deck.cards:
+            card = deck.draw()
             self.hand.append(card)
             if not silent:
                 Effect.highlight_line(f"{self.name}は{card}を引きました。")
@@ -61,6 +61,21 @@ class Player:
         else:
             print("山札が尽きました！")
             return None
+
+
+class Deck:
+    def __init__(self):
+        self.cards = [i for i in range(1, 12)]
+
+    def shuffle(self):
+        random.shuffle(self.cards)
+
+    def draw(self):
+        return self.cards.pop() if self.cards else None
+
+    def reset(self):
+        self.__init__()
+        self.shuffle()
 
 
 class Game21:
@@ -81,9 +96,8 @@ class Game21:
         self.reset_round()
 
     def reset_round(self):
-        # 山札 (1~11のカードが1セット)
-        self.deck = [i for i in range(1, 12)]
-        random.shuffle(self.deck)
+        self.deck = Deck()
+        self.deck.shuffle()
 
         self.player.reset_hand()
         self.opponent.reset_hand()
