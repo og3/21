@@ -93,12 +93,11 @@ class Game21:
         self.player = Player("あなた", Game21.INITIAL_LIFE)
         self.opponent = Player("相手", Game21.INITIAL_LIFE)
         self.round_number = Game21.INITIAL_ROUND_NUMBER
+        self.deck = Deck()
         self.reset_round()
 
     def reset_round(self):
-        self.deck = Deck()
-        self.deck.shuffle()
-
+        self.deck.reset()
         self.player.reset_hand()
         self.opponent.reset_hand()
 
