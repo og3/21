@@ -64,9 +64,6 @@ class Player:
 
 
 class Deck:
-    def __init__(self):
-        self.cards = [i for i in range(1, 12)]
-
     def shuffle(self):
         random.shuffle(self.cards)
 
@@ -74,7 +71,7 @@ class Deck:
         return self.cards.pop() if self.cards else None
 
     def reset(self):
-        self.__init__()
+        self.cards = [i for i in range(1, 12)]
         self.shuffle()
 
 
