@@ -219,6 +219,7 @@ class Game21:
                 )
                 self.player.life -= self.round_number
             else:
+                Effect.display_logo("draw")
                 print("\n引き分けです！ラウンドは進みますが、ライフはそのままです。。")
 
             # ラウンドリセット
