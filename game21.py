@@ -59,8 +59,9 @@ class Player:
 
             return card
         else:
-            print("山札が尽きました！")
-            return None
+            Effect.highlight_line("山札が尽きました！！")
+            Effect.display_with_pause()
+            return False
 
 
 class Deck:
@@ -111,7 +112,8 @@ class Game21:
         print(f"相手の手札: {self.opponent.show_hand(hide_first_card=True)}")
         choice = self.get_player_input()
         if choice.lower() == "y":
-            self.player.draw_card(self.deck)
+            if not self.player.draw_card(self.deck):
+                return False
         return choice.lower() != "n"
 
     def get_player_input(self):
@@ -217,6 +219,7 @@ class Game21:
                 )
                 self.player.life -= self.round_number
             else:
+                Effect.display_logo("draw")
                 print("\n引き分けです！ラウンドは進みますが、ライフはそのままです。。")
 
             # ラウンドリセット

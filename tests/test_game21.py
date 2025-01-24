@@ -33,7 +33,7 @@ def test_draw_card(game):
     empty_deck_game = Game21()
     empty_deck_game.deck.cards = []
     card = empty_deck_game.player.draw_card(empty_deck_game.deck, silent=False)
-    assert card is None
+    assert card is False
 
 
 def test_deal_initial_cards(game):
