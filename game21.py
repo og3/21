@@ -45,9 +45,15 @@ class Player:
 
     def show_hand(self, hide_first_card=False):
         if hide_first_card and len(self.hand) > 1:
-            return f"['?', {', '.join(map(str, self.hand[1:]))}] (合計: ?+{self.calculate_score_excluding_first()}/{Game21.MAX_SCORE})"
+            return ["?", *self.hand[1:]]
 
-        return f"{self.hand} (合計: {self.calculate_score()}/{Game21.MAX_SCORE})"
+        return self.hand
+
+    def show_score(self, hide_first_card=False):
+        if hide_first_card and len(self.hand) > 1:
+            return f"{self.show_hand(hide_first_card)} (合計: ?+{self.calculate_score_excluding_first()}/{Game21.MAX_SCORE})"
+
+        return f"{self.show_hand(hide_first_card)} (合計: {self.calculate_score()}/{Game21.MAX_SCORE})"
 
     def draw_card(self, deck, silent=False):
         if deck.cards:
@@ -108,8 +114,8 @@ class Game21:
         self.round_number += 1
 
     def player_turn(self):
-        print(f"\nあなたの手札: {self.player.show_hand(hide_first_card=True)}")
-        print(f"相手の手札: {self.opponent.show_hand(hide_first_card=True)}")
+        print(f"\nあなたの手札: {self.player.show_score(hide_first_card=True)}")
+        print(f"相手の手札: {self.opponent.show_score(hide_first_card=True)}")
         choice = self.get_player_input()
         if choice.lower() == "y":
             if not self.player.draw_card(self.deck):
@@ -169,8 +175,8 @@ class Game21:
         player_score = self.player.calculate_score()
         opponent_score = self.opponent.calculate_score()
 
-        print(f"\nあなたの手札: {self.player.show_hand(hide_first_card=False)})")
-        print(f"相手の手札: {self.opponent.show_hand(hide_first_card=False)})")
+        print(f"\nあなたの手札: {self.player.show_score(hide_first_card=False)})")
+        print(f"相手の手札: {self.opponent.show_score(hide_first_card=False)})")
 
         if player_score > Game21.MAX_SCORE and opponent_score > Game21.MAX_SCORE:
             print("両者ともバーストしました！")
@@ -193,8 +199,8 @@ class Game21:
         self.increment_round_number()
         self.deal_initial_cards()
 
-        print(f"\nあなたの手札: {self.player.show_hand(hide_first_card=True)}")
-        print(f"相手の手札: {self.opponent.show_hand(hide_first_card=True)}")
+        print(f"\nあなたの手札: {self.player.show_score(hide_first_card=True)}")
+        print(f"相手の手札: {self.opponent.show_score(hide_first_card=True)}")
 
         # 交互にカードを引く
         return self.alternating_turns()

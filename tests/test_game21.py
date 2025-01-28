@@ -59,10 +59,10 @@ def test_calculate_score_excluding_first(game):
     assert game.player.calculate_score_excluding_first() == 13
 
 
-def test_show_hand(game):
+def test_show_score(game):
     game.player.hand = [5, 6, 7]
-    assert game.player.show_hand(hide_first_card=True) == "['?', 6, 7] (合計: ?+13/21)"
-    assert game.player.show_hand(hide_first_card=False) == "[5, 6, 7] (合計: 18/21)"
+    assert game.player.show_score(hide_first_card=True) == "['?', 6, 7] (合計: ?+13/21)"
+    assert game.player.show_score(hide_first_card=False) == "[5, 6, 7] (合計: 18/21)"
 
 
 def test_opponent_turn(game):
