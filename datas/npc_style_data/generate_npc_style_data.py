@@ -1,6 +1,6 @@
 import random
 import pandas as pd
-from think_patterns import ThinkPattern
+from npc_think_patterns import NpcThinkPattern
 
 MAX_SCORE = 21
 MAX_LIFE_POINTS = 5
@@ -37,7 +37,7 @@ def generate_data_with_styles(num_samples=1000, weights=(7, 1, 2)):
 
         # プレイスタイルごとの行動ルール
         if style == "defensive":
-            draw_card = ThinkPattern.should_draw_defensive(
+            draw_card = NpcThinkPattern.should_draw_defensive(
                 opponent_burst_prob,
                 player_burst_prob,
                 round_number,
@@ -45,7 +45,7 @@ def generate_data_with_styles(num_samples=1000, weights=(7, 1, 2)):
                 player_life,
             )
         elif style == "offensive":
-            draw_card = ThinkPattern.should_draw_offensive(
+            draw_card = NpcThinkPattern.should_draw_offensive(
                 player_burst_prob,
                 score_difference,
                 round_number,
@@ -54,7 +54,7 @@ def generate_data_with_styles(num_samples=1000, weights=(7, 1, 2)):
                 opponent_life,
             )
         elif style == "cooperative":
-            draw_card = ThinkPattern.should_draw_cooperative(
+            draw_card = NpcThinkPattern.should_draw_cooperative(
                 player_burst_prob,
                 opponent_burst_prob,
                 round_number,
@@ -67,7 +67,6 @@ def generate_data_with_styles(num_samples=1000, weights=(7, 1, 2)):
         # データ行を追加
         data.append(
             {
-                "style": style,
                 "score_difference": score_difference,
                 "player_burst_prob": round(player_burst_prob, 2),
                 "opponent_burst_prob": round(opponent_burst_prob, 2),

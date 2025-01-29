@@ -1,4 +1,4 @@
-class ThinkPattern:
+class NpcThinkPattern:
 
     @staticmethod
     def should_draw_defensive(
