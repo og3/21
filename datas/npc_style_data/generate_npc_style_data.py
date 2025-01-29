@@ -82,7 +82,7 @@ def generate_data_with_styles(num_samples=1000, weights=(7, 1, 2)):
 
 
 # データ生成の例（ディフェンス: 7, オフェンス: 1, 協調: 2 の割合）
-style_data = generate_data_with_styles(1000, weights=(7, 1, 2))
+style_data = generate_data_with_styles(10000, weights=(7, 1, 2))
 
 # データを保存または表示
 style_data.to_csv("npc_style_data.csv", index=False)
