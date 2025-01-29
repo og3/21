@@ -4,7 +4,8 @@ from think_patterns import ThinkPattern
 
 MAX_SCORE = 21
 MAX_LIFE_POINTS = 5
-DECK_CARDS = 11
+# ゲーム開始時にカードを2枚ずつ引くのでゲーム中は最大8枚
+MAX_DECK_CARDS = 8
 
 
 def generate_data_with_styles(num_samples=1000, weights=(7, 1, 2)):
@@ -22,7 +23,7 @@ def generate_data_with_styles(num_samples=1000, weights=(7, 1, 2)):
         opponent_score = random.randint(1, MAX_SCORE)
         player_burst_prob = random.uniform(0, 1)
         opponent_burst_prob = random.uniform(0, 1)
-        remaining_cards_num = random.randint(1, DECK_CARDS)
+        remaining_cards_num = random.randint(1, MAX_DECK_CARDS)
         player_life = random.randint(1, MAX_LIFE_POINTS)
         opponent_life = random.randint(1, MAX_LIFE_POINTS)
 
@@ -37,15 +38,28 @@ def generate_data_with_styles(num_samples=1000, weights=(7, 1, 2)):
         # プレイスタイルごとの行動ルール
         if style == "defensive":
             draw_card = ThinkPattern.should_draw_defensive(
-                opponent_burst_prob, round_number
+                opponent_burst_prob,
+                player_burst_prob,
+                round_number,
+                remaining_cards_num,
+                player_life,
             )
         elif style == "offensive":
             draw_card = ThinkPattern.should_draw_offensive(
-                player_burst_prob, score_difference
+                player_burst_prob,
+                score_difference,
+                round_number,
+                remaining_cards_num,
+                player_life,
+                opponent_life,
             )
         elif style == "cooperative":
             draw_card = ThinkPattern.should_draw_cooperative(
-                player_burst_prob, opponent_burst_prob
+                player_burst_prob,
+                opponent_burst_prob,
+                round_number,
+                remaining_cards_num,
+                opponent_life,
             )
         else:
             draw_card = False  # デフォルト
@@ -53,6 +67,7 @@ def generate_data_with_styles(num_samples=1000, weights=(7, 1, 2)):
         # データ行を追加
         data.append(
             {
+                "style": style,
                 "score_difference": score_difference,
                 "player_burst_prob": round(player_burst_prob, 2),
                 "opponent_burst_prob": round(opponent_burst_prob, 2),
