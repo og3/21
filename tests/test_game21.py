@@ -25,14 +25,14 @@ def test_reset_round(game):
 
 
 def test_draw_card(game):
-    card = game.player.draw_card(game.deck, silent=False)
+    card = game.player.draw_card(game.deck)
     assert card in range(1, 12)
     assert len(game.player.hand) == 1
     assert len(game.deck.cards) == 10
 
     empty_deck_game = Game21()
     empty_deck_game.deck.cards = []
-    card = empty_deck_game.player.draw_card(empty_deck_game.deck, silent=False)
+    card = empty_deck_game.player.draw_card(empty_deck_game.deck)
     assert card is False
 
 
@@ -61,8 +61,14 @@ def test_calculate_score_excluding_first(game):
 
 def test_show_score(game):
     game.player.hand = [5, 6, 7]
-    assert game.player.show_score(hide_first_card=True) == "['?', 6, 7] (合計: ?+13/21)"
-    assert game.player.show_score(hide_first_card=False) == "[5, 6, 7] (合計: 18/21)"
+    assert (
+        game.player.show_score(Game21.MAX_SCORE, hide_first_card=True)
+        == "['?', 6, 7] (合計: ?+13/21)"
+    )
+    assert (
+        game.player.show_score(Game21.MAX_SCORE, hide_first_card=False)
+        == "[5, 6, 7] (合計: 18/21)"
+    )
 
 
 def test_opponent_turn(game):

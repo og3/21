@@ -1,50 +1,9 @@
 from effect import Effect
 from deck import Deck
+from player import Player
 from calculate_burst_probability import CalculateBurstProbability
 import joblib
 import pandas as pd
-
-
-class Player:
-    def __init__(self, name, initial_life):
-        self.name = name
-        self.life = initial_life
-        self.hand = []
-
-    def reset_hand(self):
-        self.hand = []
-
-    def calculate_score(self):
-        return sum(self.hand)
-
-    def calculate_score_excluding_first(self):
-        return sum(self.hand[1:])
-
-    def show_hand(self, hide_first_card=False):
-        if hide_first_card and len(self.hand) > 1:
-            return ["?", *self.hand[1:]]
-
-        return self.hand
-
-    def show_score(self, hide_first_card=False):
-        if hide_first_card and len(self.hand) > 1:
-            return f"{self.show_hand(hide_first_card)} (合計: ?+{self.calculate_score_excluding_first()}/{Game21.MAX_SCORE})"
-
-        return f"{self.show_hand(hide_first_card)} (合計: {self.calculate_score()}/{Game21.MAX_SCORE})"
-
-    def draw_card(self, deck, silent=False):
-        if deck.cards:
-            card = deck.draw()
-            self.hand.append(card)
-            if not silent:
-                Effect.highlight_line(f"{self.name}は{card}を引きました。")
-                Effect.display_with_pause()
-
-            return card
-        else:
-            Effect.highlight_line("山札が尽きました！！")
-            Effect.display_with_pause()
-            return False
 
 
 class Game21:
@@ -75,20 +34,37 @@ class Game21:
 
     def deal_initial_cards(self):
         for _ in range(Game21.INITIAL_CARDS):
-            self.player.draw_card(self.deck, silent=True)
-            self.opponent.draw_card(self.deck, silent=True)
+            self.player.draw_card(self.deck)
+            self.opponent.draw_card(self.deck)
 
     def increment_round_number(self):
         self.round_number += 1
 
     def player_turn(self):
-        print(f"\nあなたの手札: {self.player.show_score(hide_first_card=True)}")
-        print(f"相手の手札: {self.opponent.show_score(hide_first_card=True)}")
+        print(
+            f"\nあなたの手札: {self.player.show_score(Game21.MAX_SCORE, hide_first_card=True)}"
+        )
+        print(
+            f"相手の手札: {self.opponent.show_score(Game21.MAX_SCORE, hide_first_card=True)}"
+        )
         choice = self.get_player_input()
         if choice.lower() == "y":
-            if not self.player.draw_card(self.deck):
+            card = self.player.draw_card(self.deck)
+            if card:
+                Effect.highlight_line(f"{self.player.name}は{card}を引きました。")
+                Effect.display_with_pause()
+
+                return True
+
+            else:
+                Effect.highlight_line("山札が尽きました！！")
+                Effect.display_with_pause()
+
                 return False
-        return choice.lower() != "n"
+        else:
+            Effect.highlight_line("カードを引きませんでした。")
+            Effect.display_with_pause()
+            return False
 
     def get_player_input(self):
         while True:
@@ -137,10 +113,20 @@ class Game21:
     def opponent_turn(self):
 
         if self.should_draw_card(self.generate_prediction_data()):
-            self.opponent.draw_card(self.deck)
-            return True
+            card = self.opponent.draw_card(self.deck)
+            if card:
+                Effect.highlight_line(f"{self.opponent.name}は{card}を引きました。")
+                Effect.display_with_pause()
+                return True
+            else:
+                Effect.highlight_line("山札が尽きました！！")
+                Effect.display_with_pause()
+
+                return False
+
         else:
-            Effect.highlight_line("相手はカードを引きませんでした。")
+            Effect.highlight_line(f"{self.opponent.name}はカードを引きませんでした。")
+            Effect.display_with_pause()
             return False
 
     def alternating_turns(self):
@@ -173,8 +159,12 @@ class Game21:
         player_score = self.player.calculate_score()
         opponent_score = self.opponent.calculate_score()
 
-        print(f"\nあなたの手札: {self.player.show_score(hide_first_card=False)})")
-        print(f"相手の手札: {self.opponent.show_score(hide_first_card=False)})")
+        print(
+            f"\nあなたの手札: {self.player.show_score(Game21.MAX_SCORE, hide_first_card=False)})"
+        )
+        print(
+            f"相手の手札: {self.opponent.show_score(Game21.MAX_SCORE, hide_first_card=False)})"
+        )
 
         if player_score > Game21.MAX_SCORE and opponent_score > Game21.MAX_SCORE:
             print("両者ともバーストしました！")
@@ -197,8 +187,12 @@ class Game21:
         self.increment_round_number()
         self.deal_initial_cards()
 
-        print(f"\nあなたの手札: {self.player.show_score(hide_first_card=True)}")
-        print(f"相手の手札: {self.opponent.show_score(hide_first_card=True)}")
+        print(
+            f"\nあなたの手札: {self.player.show_score(Game21.MAX_SCORE, hide_first_card=True)}"
+        )
+        print(
+            f"相手の手札: {self.opponent.show_score(Game21.MAX_SCORE, hide_first_card=True)}"
+        )
 
         # 交互にカードを引く
         return self.alternating_turns()
