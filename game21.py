@@ -1,6 +1,9 @@
 import random
 import time
 from collections import Counter
+from calculate_burst_probability import CalculateBurstProbability
+import joblib
+import pandas as pd
 
 
 class Effect:
@@ -111,9 +114,12 @@ class Game21:
     INITIAL_CARDS = 2
     INITIAL_ROUND_NUMBER = 0
     MIN_OPPONENT_DRAW_SCORE = 17
+    NPC_MODEL_PATH = "./datas/npc_model_data/random_forest_model.pkl"
 
     def __init__(self):
         self.initialize_game()
+        # todo:このクラスが持つのは違和感がある
+        self.npc_model = joblib.load(Game21.NPC_MODEL_PATH)
 
     def initialize_game(self):
         # プレイヤーと相手のライフカウンターを初期化
@@ -157,11 +163,41 @@ class Game21:
                 print("入力エラーが発生しました。デフォルト値 'n' を使用します。")
                 return "n"
 
-    def opponent_turn(self):
-        opponent_score = self.opponent.calculate_score()
+    def generate_prediction_data(self):
+        score_difference = abs(
+            (Game21.MAX_SCORE - self.player.calculate_score_excluding_first())
+            - (Game21.MAX_SCORE - self.opponent.calculate_score_excluding_first())
+        )
+        player_burst_prob = CalculateBurstProbability.calculate_burst_probability(
+            self.player.show_hand(hide_first_card=True), self.deck.cards
+        )
+        opponent_burst_prob = CalculateBurstProbability.calculate_burst_probability(
+            self.opponent.show_hand(hide_first_card=True), self.deck.cards
+        )
+        prediction_data = pd.DataFrame(
+            [
+                {
+                    "score_difference": score_difference,
+                    "player_burst_prob": player_burst_prob,
+                    "opponent_burst_prob": opponent_burst_prob,
+                    "remaining_cards_num": len(self.deck.cards),
+                    "round": self.round_number,
+                    "player_life": self.player.life,
+                    "opponent_life": self.player.life,
+                }
+            ]
+        )
 
-        # 相手の判断ロジック: スコアがMIN_OPPONENT_DRAW_SCORE未満ならカードを引く
-        if opponent_score < Game21.MIN_OPPONENT_DRAW_SCORE:
+        return prediction_data
+
+    def should_draw_card(self, data):
+        prediction = self.npc_model.predict(data)
+
+        return True if prediction[0] else False
+
+    def opponent_turn(self):
+
+        if self.should_draw_card(self.generate_prediction_data()):
             self.opponent.draw_card(self.deck)
             return True
         else:
