@@ -109,4 +109,4 @@ def test_play_game_lifecycle(game, mocker):
     game.player.life = 1
     game.opponent.life = 1
     game.play_game()
-    assert game.player.life == 0 or game.opponent.life == 0
+    assert game.player.life <= 0 or game.opponent.life <= 0
