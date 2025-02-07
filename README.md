@@ -1,8 +1,13 @@
 # 「21」とは
 - カードゲーム「ブラックジャック」を題材にしたCUIゲーム（簡単に言うと手札が一枚見えないでプレイする「ブラックジャック」）
 ## 実行例
-### 「21」の起動
+### セットアップ
 ```bash
+# 環境の作成
+conda env create -f environment.yml
+# 環境の立ち上げ
+conda activate game21_env
+# 実行
 python src/game21.py
 ```
 ### NPCのプレイスタイルを決めるデータ生成
@@ -11,10 +16,6 @@ python src/game21.py
 python datas/npc_style_data/generate_npc_style_data.py
 # 上記学習データに基づいたランダムフォレストモデルの生成
 python datas/npc_model_data/train.py
-```
-#### 入ってない場合
-```bash
-conda install pandas
 ```
 ## ゲームのルール
 ### ゲームの盤面について
