@@ -1,0 +1,8 @@
+name: game21_env
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - joblib
+  - pandas
+  - sklearn
